@@ -155,6 +155,7 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
   <button class="nav" onclick="showPage('motion',this)">↗ Motion Transfer</button>    
   <button class="nav" onclick="showPage('creations',this)">▣ My Creations</button>    
   <button class="nav" onclick="showPage('account',this)">⚙ Dashboard</button>    
+  <button class="nav" onclick="showPage('referral',this)">🎁 Referral</button>
 </aside>  <main>  <!-- HOME -->  <section class="section active" id="home">    
   <div class="hero">    
     <h1>Create Beyond <span class="gradient">Imagination.</span></h1>    
@@ -274,7 +275,54 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
     <button class="btn secondary" onclick="signOut()">Logout</button>    
     <p class="notice" id="authMessage">Pendaftaran memerlukan konfirmasi email jika Confirm email aktif.</p>    
   </div>    
-</section>  </main>    
+</section> <!-- REFERRAL -->
+<section class="section" id="referral">
+  <div class="panel">
+    <h2>🎁 Referral Program</h2>
+    <p class="muted">
+      Undang teman dan dapatkan hadiah 500 poin
+      setelah persyaratan Referral terpenuhi.
+    </p>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <strong id="referralCount">—</strong>
+        <p>Anggota Berhasil</p>
+      </div>
+
+      <div class="stat">
+        <strong id="referralPoints">—</strong>
+        <p>Total Poin Referral</p>
+      </div>
+
+      <div class="stat">
+        <strong id="referralPending">—</strong>
+        <p>Pembayaran Menunggu</p>
+      </div>
+    </div>
+
+    <h3>Kode Referral Saya</h3>
+
+    <div class="notice" id="referralCode">
+      Kode Referral belum dimuat.
+    </div>
+
+    <button class="btn secondary" onclick="copyReferralCode()">
+      Salin Kode Referral
+    </button>
+
+    <h3>Anggota Referral</h3>
+    <div class="empty">
+      Belum ada data anggota Referral.
+    </div>
+
+    <h3>Riwayat Hadiah</h3>
+    <div class="empty">
+      Belum ada riwayat hadiah.
+    </div>
+  </div>
+    </section> 
+</main>    
 </div>  <footer>© 2026 MNT Studio AI · Create Without Limits</footer>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script>    
 const SUPABASE_URL = "https://wyzvszvefwxirjfkukav.supabase.co";    
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TAPKURJ0vcSayWkrPP6yuQ_nunlVUAw";    
