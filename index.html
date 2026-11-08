@@ -150,7 +150,7 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
 
 <header>
   <div class="logo">✦ MNT <span>STUDIO</span></div>
-  <div class="token">◆ <span id="balance">100</span> Tokens</div>
+  <div class="token">◆ <span id="balance">—</span> Tokens</div>
 </header>
 
 <div class="layout">
@@ -174,7 +174,7 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
     <button class="btn" onclick="showPage('video',document.querySelectorAll('.nav')[2])">Mulai Membuat Video →</button>
   </div>
   <div class="stat-grid">
-    <div class="stat"><strong>100</strong><p>Demo Tokens</p></div>
+    <div class="stat"><strong id="homeBalance">—</strong><p>Token Balance</p></div>
     <div class="stat"><strong>10</strong><p>Foto Karakter Maksimal</p></div>
     <div class="stat"><strong>30s</strong><p>Durasi Maksimal</p></div>
   </div>
@@ -293,11 +293,21 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
   <div class="panel">
     <h2>⚙ Dashboard</h2>
     <div class="stat-grid">
-      <div class="stat"><strong id="accountBalance">100</strong><p>Demo Tokens</p></div>
+      <div class="stat"><strong id="accountBalance">—</strong><p>Token Balance</p></div>
       <div class="stat"><strong>AI</strong><p>Studio Status</p></div>
     </div>
     <h3>Account & Security</h3>
-    <p class="muted">Login, verifikasi email, transaksi token, dan pengaturan akun akan diaktifkan setelah backend Supabase terhubung.</p>
+    <p class="muted" id="authStatus">Belum login. Daftar atau masuk menggunakan email.</p>
+    <label>Email</label>
+    <input id="authEmail" type="email" autocomplete="email" placeholder="email kamu">
+    <label>Password</label>
+    <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
+    <label>Nama tampilan (untuk pendaftaran)</label>
+    <input id="displayName" type="text" autocomplete="name" placeholder="Nama kamu">
+    <button class="btn" onclick="signUp()">Daftar</button>
+    <button class="btn secondary" onclick="signIn()">Login</button>
+    <button class="btn secondary" onclick="signOut()">Logout</button>
+    <p class="notice" id="authMessage">Pendaftaran memerlukan konfirmasi email jika Confirm email aktif.</p>
   </div>
 </section>
 
@@ -306,7 +316,12 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
 
 <footer>© 2026 MNT Studio AI · Create Without Limits</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://wyzvszvefwxirjfkukav.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TAPKURJ0vcSayWkrPP6yuQ_nunlVUAw";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
 function showPage(id,button){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -362,7 +377,76 @@ function generate(type){
   }
   alert('Pengaturan '+type+' berhasil disiapkan! Mesin AI belum terhubung. Tahap berikutnya adalah integrasi backend dan API AI.');
 }
+
+function setAuthMessage(message){
+  document.getElementById('authMessage').textContent = message;
+}
+function setTokenBalance(value){
+  const amount = (value === null || value === undefined) ? '—' : String(value);
+  document.getElementById('balance').textContent = amount;
+  document.getElementById('homeBalance').textContent = amount;
+  document.getElementById('accountBalance').textContent = amount;
+}
+async function refreshAuthUI(){
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const status = document.getElementById('authStatus');
+  if(!session){
+    status.textContent = 'Belum login. Daftar atau masuk menggunakan email.';
+    setTokenBalance(null);
+    return;
+  }
+  status.textContent = 'Login sebagai: ' + (session.user.email || 'pengguna');
+  const { data: profile, error } = await supabaseClient
+    .from('profiles').select('display_name, token_balance')
+    .eq('id', session.user.id).maybeSingle();
+  if(error){
+    setTokenBalance(null);
+    setAuthMessage('Login berhasil, tetapi profil belum dapat dibaca. Periksa kebijakan SELECT profiles.');
+    return;
+  }
+  if(!profile){
+    setTokenBalance(null);
+    setAuthMessage('Login berhasil. Profil belum tersedia. Profil perlu dibuat melalui trigger/backend aman Supabase.');
+    return;
+  }
+  setTokenBalance(profile.token_balance);
+  setAuthMessage('Profil berhasil dimuat' + (profile.display_name ? ': ' + profile.display_name : '') + '.');
+}
+async function signUp(){
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const displayName = document.getElementById('displayName').value.trim();
+  if(!email || !password){ setAuthMessage('Isi email dan password terlebih dahulu.'); return; }
+  const { data, error } = await supabaseClient.auth.signUp({
+    email, password, options: { data: { display_name: displayName } }
+  });
+  if(error){ setAuthMessage('Pendaftaran gagal: ' + error.message); return; }
+  if(data.session){
+    setAuthMessage('Pendaftaran berhasil. Memuat profil...');
+    await refreshAuthUI();
+  }else{
+    setAuthMessage('Pendaftaran diterima. Cek email untuk konfirmasi, lalu login.');
+  }
+}
+async function signIn(){
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if(!email || !password){ setAuthMessage('Isi email dan password terlebih dahulu.'); return; }
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error){ setAuthMessage('Login gagal: ' + error.message); return; }
+  setAuthMessage('Login berhasil.');
+  await refreshAuthUI();
+}
+async function signOut(){
+  const { error } = await supabaseClient.auth.signOut();
+  if(error){ setAuthMessage('Logout gagal: ' + error.message); return; }
+  setAuthMessage('Kamu sudah logout.');
+  await refreshAuthUI();
+}
+supabaseClient.auth.onAuthStateChange(() => {
+  setTimeout(() => refreshAuthUI(), 0);
+});
+refreshAuthUI();
 </script>
 </body>
   </html>
-  
