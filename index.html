@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">    
 <meta name="theme-color" content="#100b1d">    
 <title>MNT Studio AI</title>    
-<style>    
+<style>   
 :root {    
   --bg:#0c0914;    
   --panel:#171222;    
@@ -18,7 +18,104 @@
 body{    
   margin:0;background:var(--bg);color:var(--text);    
   font-family:Arial,Helvetica,sans-serif;    
-}    
+}   
+/* WELCOME SCREEN */
+#welcomeScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  background:
+    radial-gradient(circle at 50% 35%, #302047, #0c0914 70%);
+}
+
+.welcome-card {
+  width: 100%;
+  max-width: 430px;
+  text-align: center;
+}
+
+.welcome-logo {
+  font-size: 30px;
+  font-weight: 900;
+  color: #c18aff;
+  margin-bottom: 65px;
+}
+
+.welcome-logo span {
+  color: white;
+}
+
+.welcome-card h1 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.welcome-card p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.welcome-art {
+  margin: 45px auto;
+  width: 190px;
+  height: 190px;
+  border-radius: 35px;
+  background: linear-gradient(135deg,#46266b,#171126);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 75px;
+  box-shadow: 0 15px 55px #0008;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 17px;
+  border: 0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #222;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.google-btn:disabled {
+  opacity: .6;
+}
+
+.email-option {
+  background: transparent;
+  color: #c18aff;
+  border: 1px solid #49375b;
+  margin-top: 15px;
+  padding: 14px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+#googleMessage {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #cdb7e5;
+  line-height: 1.6;
+}
+
+#appShell[hidden],
+#welcomeScreen[hidden] {
+  display: none !important;
+}
+
+@media(max-width:500px) {
+  .welcome-card h1 {
+    font-size: 25px;
+  }
+  .welcome-art {
+    width: 160px;
+    height: 160px;
+  }
+}
 button,input,textarea,select{font:inherit}    
 button{cursor:pointer}    
 header{    
@@ -143,7 +240,57 @@ footer{text-align:center;padding:25px;color:#756a83;font-size:12px}
 }    
 </style>    
 </head>    
-<body>  <header>    
+<body> <div id="welcomeScreen">
+  <div class="welcome-card">
+
+    <div class="welcome-logo">
+      ✦ MNT <span>STUDIO AI</span>
+    </div>
+
+    <h1>
+      Tim AI <span class="gradient">Kamu</span>
+    </h1>
+
+    <p>Selamat datang di MNT Studio AI.</p>
+
+    <div class="welcome-art">
+      ✨
+    </div>
+
+    <h2>Studio Kreatif AI</h2>
+
+    <p>
+      Wujudkan ide kreatif menjadi gambar,
+      video, dan karya AI yang luar biasa.
+    </p>
+
+    <button
+      class="google-btn"
+      id="googleButton"
+      onclick="signInWithGoogle()">
+      🌐 Lanjutkan dengan Google
+    </button>
+
+    <button
+      class="email-option"
+      onclick="openEmailLogin()">
+      Masuk atau daftar menggunakan Email
+    </button>
+
+    <div id="googleMessage"></div>
+
+    <p style="font-size:11px;margin-top:25px">
+      Dengan melanjutkan, kamu menyetujui
+      Ketentuan Layanan dan Kebijakan Privasi
+      MNT Studio AI.
+    </p>
+
+  </div>
+</div>
+
+  <div id="appShell" hidden>
+    
+  <header>    
   <div class="logo">✦ MNT <span>STUDIO</span></div>    
   <div class="token">◆ <span id="balance">—</span> Tokens</div>    
 </header>  <div class="layout">    
