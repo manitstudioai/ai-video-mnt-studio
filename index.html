@@ -563,6 +563,13 @@ return;
 setTokenBalance(profile.token_balance);
 setAuthMessage('Profil berhasil dimuat' + (profile.display_name ? ': ' + profile.display_name : '') + '.');
 }
+  function openEmailLogin(){
+  document.getElementById('welcomeScreen').hidden = true;
+  document.getElementById('appShell').hidden = false;
+
+  const accountButton = document.querySelectorAll('.nav')[5];
+  showPage('account', accountButton);
+}
 async function signUp(){
 const email = document.getElementById('authEmail').value.trim();
 const password = document.getElementById('authPassword').value;
