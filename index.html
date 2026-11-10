@@ -576,7 +576,12 @@ const password = document.getElementById('authPassword').value;
 const displayName = document.getElementById('displayName').value.trim();
 if(!email || !password){ setAuthMessage('Isi email dan password terlebih dahulu.'); return; }
 const { data, error } = await supabaseClient.auth.signUp({
-email, password, options: { data: { display_name: displayName } }
+  email,
+  password,
+  options: {
+    data: { display_name: displayName },
+    emailRedirectTo: 'https://manitstudioai.github.io/ai-video-mnt-studio/'
+  }
 });
 if(error){ setAuthMessage('Pendaftaran gagal: ' + error.message); return; }
 if(data.session){
