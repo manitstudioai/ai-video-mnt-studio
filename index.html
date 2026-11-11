@@ -569,6 +569,28 @@ setAuthMessage('Profil berhasil dimuat' + (profile.display_name ? ': ' + profile
 
   const accountButton = document.querySelectorAll('.nav')[5];
   showPage('account', accountButton);
+  }
+async function signInWithGoogle(){
+  const message = document.getElementById('googleMessage');
+  const button = document.getElementById('googleButton');
+
+  button.disabled = true;
+  message.textContent = 'Menghubungkan ke Google...';
+
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://manitstudioai.github.io/ai-video-mnt-studio/',
+      queryParams: {
+        prompt: 'select_account'
+      }
+    }
+  });
+
+  if(error){
+    message.textContent = 'Login Google gagal: ' + error.message;
+    button.disabled = false;
+  }
 }
 async function signUp(){
 const email = document.getElementById('authEmail').value.trim();
@@ -612,4 +634,4 @@ setTimeout(() => refreshAuthUI(), 0);
 refreshAuthUI();
 </script>  </body>
 
-  </html>    ini kode lama
+  </html>    MNT STUDIO AI
