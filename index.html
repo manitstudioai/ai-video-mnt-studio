@@ -638,10 +638,21 @@ setAuthMessage('Pendaftaran diterima. Cek email untuk konfirmasi, lalu login.');
 async function signIn(){
 const email = document.getElementById('authEmail').value.trim();
 const password = document.getElementById('authPassword').value;
-if(!email || !password){ setAuthMessage('Isi email dan password terlebih dahulu.'); return; }
-const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-if(error){ setAuthMessage('Login gagal: ' + error.message); return; }
-setAuthMessage('Login berhasil.');
+if(!email || !password){
+  setAuthMessage('Isi email dan password terlebih dahulu.');
+  return;
+}
+
+const { error } = await supabaseClient.auth.signInWithPassword({
+  email,
+  password
+});
+
+if(error){
+  setAuthMessage('Login gagal: ' + error.message);
+  return;
+}
+  setAuthMessage('Login berhasil.');
 await refreshAuthUI();
 }
 async function signOut(){
