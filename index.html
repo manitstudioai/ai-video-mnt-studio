@@ -538,32 +538,54 @@ document.getElementById('balance').textContent = amount;
 document.getElementById('homeBalance').textContent = amount;
 document.getElementById('accountBalance').textContent = amount;
 }
+
 async function refreshAuthUI(){
-const { data: { session } } = await supabaseClient.auth.getSession();
-const status = document.getElementById('authStatus');
-if(!session){
-status.textContent = 'Belum login. Daftar atau masuk menggunakan email.';
-setTokenBalance(null);
-return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  const status = document.getElementById('authStatus');
+
+  if(!session){
+    document.getElementById('welcomeScreen').hidden = false;
+    document.getElementById('appShell').hidden = true;
+
+    if(status){
+      status.textContent = 'Belum login. Daftar atau masuk menggunakan email.';
+    }
+
+    setTokenBalance(null);
+    return;
+  }
+
+  document.getElementById('welcomeScreen').hidden = true;
+  document.getElementById('appShell').hidden = false;
+
+  if(status){
+    status.textContent = 'Login sebagai: ' + (session.user.email || 'pengguna');
+  }
+
+  const { data: profile, error } = await supabaseClient
+    .from('profiles')
+    .select('display_name, token_balance')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if(error){
+    setTokenBalance(null);
+    setAuthMessage('Login berhasil, tetapi profil belum dapat dibaca.');
+    return;
+  }
+
+  if(!profile){
+    setTokenBalance(null);
+    setAuthMessage('Login berhasil. Profil belum tersedia.');
+    return;
+  }
+
+  setTokenBalance(profile.token_balance);
+  setAuthMessage('Profil berhasil dimuat' +
+    (profile.display_name ? ': ' + profile.display_name : '') + '.');
 }
-status.textContent = 'Login sebagai: ' + (session.user.email || 'pengguna');
-const { data: profile, error } = await supabaseClient
-.from('profiles').select('display_name, token_balance')
-.eq('id', session.user.id).maybeSingle();
-if(error){
-setTokenBalance(null);
-setAuthMessage('Login berhasil, tetapi profil belum dapat dibaca. Periksa kebijakan SELECT profiles.');
-return;
-}
-if(!profile){
-setTokenBalance(null);
-setAuthMessage('Login berhasil. Profil belum tersedia. Profil perlu dibuat melalui trigger/backend aman Supabase.');
-return;
-}
-setTokenBalance(profile.token_balance);
-setAuthMessage('Profil berhasil dimuat' + (profile.display_name ? ': ' + profile.display_name : '') + '.');
-}
-  function openEmailLogin(){
+function openEmailLogin(){
   document.getElementById('welcomeScreen').hidden = true;
   document.getElementById('appShell').hidden = false;
 
@@ -631,7 +653,7 @@ await refreshAuthUI();
 supabaseClient.auth.onAuthStateChange(() => {
 setTimeout(() => refreshAuthUI(), 0);
 });
-refreshAuthUI();
-</script>  </body>
-
-  </html>    MNT STUDIO AI
+  refreshAuthUI();
+</script>
+</body>
+</html>
